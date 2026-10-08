@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>1981팔구사 금 중량 통합 계산기</title>
+
+  <style>
+    /* =========================
+       기본 설정
+    ========================= */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f6f3ec;
+      color: #222;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans KR",
+        sans-serif;
+    }
+
+    .wrapper {
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 32px 14px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      text-align: center;
+      font-size: 29px;
+    }
+
+    .lead {
+      margin: 0 0 25px;
+      text-align: center;
+      color: #777;
+      font-size: 14px;
+    }
+
+
+    /* =========================
+       카드
+    ========================= */
+    .card {
+      margin-bottom: 18px;
+      padding: 24px;
+
+      background: #fff;
+      border: 1px solid #e8e1d5;
+      border-radius: 20px;
+
+      box-shadow: 0 8px 28px #0000000d;
+    }
+
+    .card-title {
+      margin-bottom: 6px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .card-description {
+      margin-bottom: 18px;
+      color: #888;
+      font-size: 13px;
+    }
+
+
+    /* =========================
+       순도 선택 버튼
+    ========================= */
+    .purity-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .purity-selector button {
+      height: 49px;
+
+      background: #fff;
+      border: 1px solid #ddd5c8;
+      border-radius: 12px;
+
+      font-size: 16px;
+      font-weight: 800;
+
+      cursor: pointer;
+    }
+
+    .purity-selector button.active {
+      background: #292620;
+      color: #fff;
+      border-color: #292620;
+    }
+
+
+    /* =========================
+       입력창
+    ========================= */
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      gap: 8px;
+    }
+
+    input,
+    select {
+      height: 55px;
+      padding: 0 14px;
+
+      background: #fff;
+      border: 1px solid #ddd5c8;
+      border-radius: 12px;
+
+      font-size: 17px;
+      outline: none;
+    }
+
+    input {
+      width: 100%;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+
+    /* =========================
+       통합 환산 결과
+    ========================= */
+    .result-box {
+      margin-top: 18px;
+      overflow: hidden;
+
+      border: 1px solid #eadfc9;
+      border-radius: 15px;
+    }
+
+    .result-header {
+      padding: 11px 15px;
+
+      background: #f5ecd9;
+      color: #846426;
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+
+      padding: 16px 15px;
+      border-top: 1px solid #eee8de;
+    }
+
+    .result-row.total {
+      background: #fbf8f1;
+    }
+
+    .result-label {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .result-label b {
+      display: block;
+      margin-top: 3px;
+
+      color: #222;
+      font-size: 15px;
+    }
+
+    .result-value {
+      text-align: right;
+      color: #98722d;
+      font-size: 22px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    /* g / 돈 결과 글자 크기 동일 */
+    .result-value span,
+    .result-value small {
+      display: block;
+      color: #98722d;
+      font-size: 22px;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+
+    .result-value small {
+      margin-top: 4px;
+    }
+
+    .tag {
+      margin-left: 4px;
+      padding: 3px 6px;
+
+      background: #292620;
+      color: #fff;
+      border-radius: 20px;
+
+      font-size: 9px;
+    }
+
+
+    /* =========================
+       계산식 안내
+    ========================= */
+    .note {
+      margin-top: 12px;
+      color: #999;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+
+    /* =========================
+       g ↔ 돈 빠른 변환
+    ========================= */
+    .quick-input {
+      display: grid;
+      grid-template-columns: 1fr 170px;
+      gap: 8px;
+    }
+
+    .quick-result {
+      margin-top: 13px;
+      padding: 17px;
+
+      background: #fbf8f1;
+      border: 1px solid #eadfc9;
+      border-radius: 13px;
+
+      color: #888;
+      font-size: 12px;
+    }
+
+    .quick-result b {
+      display: block;
+      margin-top: 3px;
+
+      color: #98722d;
+      font-size: 26px;
+    }
+
+
+    /* =========================
+       사용 예시
+    ========================= */
+    .info {
+      padding: 16px;
+
+      background: #fff;
+      border: 1px solid #e8e1d5;
+      border-radius: 14px;
+
+      color: #777;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      color: #aaa;
+      font-size: 10px;
+    }
+
+
+    /* =========================
+       모바일
+    ========================= */
+    @media (max-width: 600px) {
+      .wrapper {
+        padding-top: 24px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .card {
+        padding: 18px 14px;
+        border-radius: 17px;
+      }
+
+      .quick-input {
+        grid-template-columns: 1fr;
+      }
+
+      .result-row {
+        padding: 14px 12px;
+      }
+
+      .result-value,
+      .result-value span,
+      .result-value small {
+        font-size: 20px;
+      }
+    }
+
+    /* 금액 계산 */
+    .price-field { margin-top: 18px; }
+    .price-field label { display:block; font-size:14px; font-weight:800; margin-bottom:8px; }
+    .price-field .price-hint { color:#888; font-size:12px; margin-top:7px; }
+    .price-result { margin-top:14px; padding:18px 15px; background:#fbf8f1; border:1px solid #eadfc9; border-radius:15px; }
+    .price-result .price-caption { font-size:13px; color:#777; }
+    .price-result .price-amount { display:block; margin-top:7px; font-size:clamp(23px, 5vw, 32px); font-weight:850; color:#98722d; overflow-wrap:anywhere; }
+    .price-result .price-detail { display:block; margin-top:8px; color:#777; font-size:12px; }
+  </style>
+</head>
+
+
+<body>
+
+  <main class="wrapper">
+
+    <!-- =========================
+         상단 제목
+    ========================== -->
+    <h1>1981팔구사 금 중량 통합 계산기</h1>
+
+    <p class="lead">
+      총판 결제 금 중량과 손님 안내 중량 및 가격을 한번에 확인가능
+    </p>
+
+
+    <!-- =========================
+         금 중량 통합 계산기
+    ========================== -->
+    <section class="card">
+
+      <div class="card-title">
+        기준 중량 입력
+      </div>
+
+      <div class="card-description">
+        제품의 순도를 선택하고 중량 입력
+      </div>
+
+
+      <!-- 순도 선택 -->
+      <div class="purity-selector">
+        <button class="active" data-purity="14">14K</button>
+        <button data-purity="18">18K</button>
+        <button data-purity="24">순금</button>
+      </div>
+
+
+      <!-- 중량 입력 -->
+      <div class="input-row">
+
+        <input
+          id="weightInput"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="any"
+          placeholder="중량 입력"
+        >
+
+        <select id="weightUnit">
+          <option value="g">g</option>
+          <option value="don">돈</option>
+        </select>
+
+      </div>
+
+
+      <!-- 결과 -->
+      <div class="result-box">
+
+        <div class="result-header">
+          통합 환산 결과
+        </div>
+
+
+        <!-- 14K -->
+        <div class="result-row">
+
+          <div class="result-label">
+            14K 기준
+
+            <span class="tag">
+              손님 안내
+            </span>
+
+            <b>손님 안내 14K 중량</b>
+          </div>
+
+          <div class="result-value">
+            <span id="result14Gram">0.00 g</span>
+            <small id="result14Don">0.00 돈</small>
+          </div>
+
+        </div>
+
+
+        <!-- 18K -->
+        <div class="result-row">
+
+          <div class="result-label">
+            18K 기준
+
+            <span class="tag">
+              손님 안내
+            </span>
+
+            <b>손님 안내 18K 중량</b>
+          </div>
+
+          <div class="result-value">
+            <span id="result18Gram">0.00 g</span>
+            <small id="result18Don">0.00 돈</small>
+          </div>
+
+        </div>
+
+
+        <!-- 순금 -->
+        <div class="result-row total">
+
+          <div class="result-label">
+
+            순금 기준
+
+            <span class="tag">
+              총판 결제
+            </span>
+
+            <b>총판 결제 순금 중량</b>
+
+          </div>
+
+          <div class="result-value">
+            <span id="result24Gram">0.00 g</span>
+            <small id="result24Don">0.00 돈</small>
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- 금액 계산 -->
+      <div class="price-field">
+        <label for="goldPriceInput">순금 1돈 가격 (원)</label>
+        <input id="goldPriceInput" type="text" inputmode="numeric" autocomplete="off" placeholder="순금 1돈 가격 입력 예: 700,000" aria-describedby="goldPriceHint">
+        <div class="price-hint" id="goldPriceHint">순금 1돈(3.75g) 기준 가격을 입력하면 순금 중량 기준으로 계산됨</div>
+      </div>
+      <div class="price-result" aria-live="polite">
+        <span class="price-caption">총 금액</span>
+        <strong class="price-amount" id="goldPriceResult">시세입력대기</strong>
+        <span class="price-detail" id="goldPriceDetail">순금 중량 × 1돈 가격</span>
+      </div>
+
+      <!-- 계산식 -->
+      <div class="note">
+
+        14K × 0.6435 → 순금 ·
+        18K × 0.825 → 순금 ·
+        순금 ÷ 0.6435 → 14K ·
+        순금 ÷ 0.825 → 18K
+
+        <br>
+
+        함량 환산은 소수점 둘째 자리까지 올림
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         g ↔ 돈 빠른 변환
+    ========================== -->
+    <section class="card">
+
+      <div class="card-title">
+        그램 · 돈 빠른 변환
+      </div>
+
+      <div class="card-description">
+        1돈 = 3.75g 기준
+      </div>
+
+
+      <div class="quick-input">
+
+        <input
+          id="quickWeight"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="any"
+          placeholder="중량 입력"
+        >
+
+        <select id="quickType">
+
+          <option value="gramToDon">
+            g → 돈
+          </option>
+
+          <option value="donToGram">
+            돈 → g
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="quick-result">
+
+        <span id="quickLabel">
+          변환된 돈 단위
+        </span>
+
+        <b id="quickResult">
+          0.00 돈
+        </b>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         사용 예시
+    ========================== -->
+    <div class="info">
+
+      <b>사용 예시</b>
+
+      <br>
+
+      18K 10g을 입력하면 손님 안내용 18K 10.00g과
+      총판 결제용 순금 8.25g을 같은 화면에 표시.
+
+      순금을 입력하면 14K·18K 환산 중량도 동시에 확인가능
+
+    </div>
+
+
+    <footer>
+      Copyrightⓒ 1981팔구사 Created by 1981 팔구사
+    </footer>
+
+  </main>
+
+
+  <script>
+    /* =========================
+       기본 설정
+    ========================= */
+
+    const $ = (id) => document.getElementById(id);
+
+    const PURITY_14K = 0.6435;
+    const PURITY_18K = 0.825;
+
+    const GRAMS_PER_DON = 3.75;
+
+    let selectedPurity = "14";
+    let currentPureGoldGram = 0;
+
+
+    /* =========================
+       숫자 처리
+    ========================= */
+
+    // 소수점 둘째 자리까지 올림
+    function ceilToTwoDecimals(number) {
+      return Math.ceil((number - 1e-10) * 100) / 100;
+    }
+
+
+    // 소수점 둘째 자리 표시
+    function formatWeight(number) {
+      return ceilToTwoDecimals(number).toFixed(2);
+    }
+
+
+    /* =========================
+       순도 선택
+    ========================= */
+
+    document
+      .querySelectorAll(".purity-selector button")
+      .forEach((button) => {
+
+        button.addEventListener("click", () => {
+
+          document
+            .querySelectorAll(".purity-selector button")
+            .forEach((item) => {
+              item.classList.remove("active");
+            });
+
+          button.classList.add("active");
+
+          selectedPurity = button.dataset.purity;
+
+          calculateGoldWeight();
+        });
+
+      });
+
+
+    /* =========================
+       금 중량 통합 계산
+    ========================= */
+
+    function calculateGoldWeight() {
+
+      let inputWeight = parseFloat(
+        $("weightInput").value
+      );
+
+
+      // 잘못된 값 처리
+      if (
+        !Number.isFinite(inputWeight) ||
+        inputWeight < 0
+      ) {
+        inputWeight = 0;
+      }
+
+
+      /* 입력값을 g 기준으로 통일 */
+
+      const inputGram =
+        $("weightUnit").value === "don"
+          ? inputWeight * GRAMS_PER_DON
+          : inputWeight;
+
+
+      /* 순금 기준 중량 계산 */
+
+      let pureGoldGram;
+
+      if (selectedPurity === "14") {
+
+        pureGoldGram =
+          inputGram * PURITY_14K;
+
+      } else if (selectedPurity === "18") {
+
+        pureGoldGram =
+          inputGram * PURITY_18K;
+
+      } else {
+
+        pureGoldGram =
+          inputGram;
+      }
+
+
+      /* 14K 환산 */
+
+      const gram14 =
+        selectedPurity === "14"
+          ? inputGram
+          : pureGoldGram / PURITY_14K;
+
+
+      /* 18K 환산 */
+
+      const gram18 =
+        selectedPurity === "18"
+          ? inputGram
+          : pureGoldGram / PURITY_18K;
+
+
+      /* 순금 환산 */
+
+      const gram24 =
+        selectedPurity === "24"
+          ? inputGram
+          : pureGoldGram;
+
+
+      currentPureGoldGram = gram24;
+      calculateGoldPrice();
+
+      /* 결과 출력 */
+
+      updateResult(
+        "14",
+        gram14
+      );
+
+      updateResult(
+        "18",
+        gram18
+      );
+
+      updateResult(
+        "24",
+        gram24
+      );
+    }
+
+
+    /* =========================
+       결과 표시
+    ========================= */
+
+    function updateResult(purity, gram) {
+
+      $("result" + purity + "Gram")
+        .textContent =
+          formatWeight(gram) + " g";
+
+
+      $("result" + purity + "Don")
+        .textContent =
+          (gram / GRAMS_PER_DON)
+            .toFixed(2) + " 돈";
+    }
+
+
+    /* 입력값 변경 감지 */
+
+    $("weightInput")
+      .addEventListener(
+        "input",
+        calculateGoldWeight
+      );
+
+
+    $("weightUnit")
+      .addEventListener(
+        "change",
+        calculateGoldWeight
+      );
+
+
+    /* =========================
+       g ↔ 돈 빠른 변환
+    ========================= */
+
+    function calculateQuickConversion() {
+
+      let inputWeight =
+        parseFloat(
+          $("quickWeight").value
+        );
+
+
+      if (
+        !Number.isFinite(inputWeight) ||
+        inputWeight < 0
+      ) {
+        inputWeight = 0;
+      }
+
+
+      const conversionType =
+        $("quickType").value;
+
+
+      /* g → 돈 */
+
+      if (
+        conversionType === "gramToDon"
+      ) {
+
+        const result =
+          inputWeight / GRAMS_PER_DON;
+
+
+        $("quickLabel")
+          .textContent =
+            "변환된 돈 단위";
+
+
+        $("quickResult")
+          .textContent =
+            result.toFixed(2) + " 돈";
+
+
+      /* 돈 → g */
+
+      } else {
+
+        const result =
+          inputWeight * GRAMS_PER_DON;
+
+
+        $("quickLabel")
+          .textContent =
+            "변환된 g 단위";
+
+
+        $("quickResult")
+          .textContent =
+            result.toFixed(2) + " g";
+      }
+    }
+
+
+    $("quickWeight")
+      .addEventListener(
+        "input",
+        calculateQuickConversion
+      );
+
+
+    $("quickType")
+      .addEventListener(
+        "change",
+        calculateQuickConversion
+      );
+
+
+
+    /* 금액 계산: 순금 실제 환산 중량을 기준으로 천 원 단위 올림 */
+    const goldPriceInput = $("goldPriceInput");
+    function calculateGoldPrice() {
+      const raw = goldPriceInput.value.replace(/[^0-9]/g, "");
+      const pricePerDon = Number(raw);
+      if (!raw || !Number.isFinite(pricePerDon) || pricePerDon <= 0) {
+        $("goldPriceResult").textContent = "시세를 입력하세요";
+        $("goldPriceDetail").textContent = "순금 중량 × 1돈 가격";
+        return;
+      }
+      const pureDon = currentPureGoldGram / GRAMS_PER_DON;
+      const unroundedPrice = pureDon * pricePerDon;
+      const roundedPrice = Math.ceil((unroundedPrice - 1e-7) / 1000) * 1000;
+      $("goldPriceResult").textContent = roundedPrice.toLocaleString("ko-KR") + "원";
+      $("goldPriceDetail").textContent =
+        "순금 " + pureDon.toFixed(4) + "돈 × " + pricePerDon.toLocaleString("ko-KR") + "원 (천 원 올림)";
+    }
+    goldPriceInput.addEventListener("input", () => {
+      const digits = goldPriceInput.value.replace(/[^0-9]/g, "");
+      goldPriceInput.value = digits ? Number(digits).toLocaleString("ko-KR") : "";
+      calculateGoldPrice();
+    });
+
+    /* =========================
+       최초 실행
+    ========================= */
+
+    calculateGoldWeight();
+    calculateQuickConversion();
+
+  </script>
+
+</body>
+</html>
